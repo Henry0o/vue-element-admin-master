@@ -4,13 +4,21 @@
       <el-form-item label="更新包发布">
         <el-switch v-model="form.boardUpdate"></el-switch>
       </el-form-item>
+      <el-form-item label="选择更新包">
+        <el-select v-model="filename" placeholder="请选择更新包">
+          <el-option v-for="item in files" :key="item.version" :label="item.version" :value="item.fileName">
+            <span style="float: left">{{ item.version }}</span>
+            <span style="float: right; color: #8492a6; font-size: 13px">{{ item.aliasName }}</span>
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="最新版本">
         <el-input v-model="form.new_version"></el-input>
       </el-form-item>
-      <el-form-item label="更新包路径">
+      <!-- <el-form-item label="更新包路径">
         <el-input v-model="form.update_url"></el-input>
         <div>PS:name后面加对应上传的文件名即可,浏览器访问即可下载,设备下载时可能需要用GET方法下载,上传文件名不可以带中文</div>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="广播配置设置">
         <el-switch v-model="form.boardConfig"></el-switch>
       </el-form-item>
@@ -47,7 +55,9 @@
     getDeviceConfig,
     editDeviceConfig,
   } from '@/api/healthinfo'
-
+  import {
+    fetchAllFileNameList
+  } from '@/api/fileNameList'
   const OPEN_PHOTO_UPLOAD = '0366H0001';
   const CLOSE_PHOTO_UPLOAD = '0366H0000';
   const OVER_24H_WARN = '0369H0001';
@@ -60,6 +70,8 @@
     data() {
 
       return {
+        filename: '',
+        files: null,
         form: {
           boardUpdate: false,
           new_version: '',
@@ -74,20 +86,31 @@
           config: '',
           upg_path: '',
           boardUpdate: 0,
+        },
+        queryList: {
+          page: 1,
+          size: 1000,
+          sortType: '',
+          sortFields: ''
         }
       }
     },
     created() {
       this.getList();
+      this.getFiles();
     },
     watch() {
 
     },
     methods: {
+      getFiles() {
+        fetchAllFileNameList().then(response => {
+          this.files = response.data
+        })
+      },
       getList() {
         getDeviceConfig().then(response => {
           this.editform = response.data;
-          console.log(this.editform)
           if (this.editform.boardUpdate === 1) {
             this.form.boardUpdate = true;
           } else {
@@ -118,11 +141,9 @@
           if (this.editform.config.includes(OVER_NO_WARN)) {
             this.form.TimeOverWarn = 0;
           }
-          console.log(this.form)
         })
       },
       EditList(form) {
-        console.log(form)
         this.editform.version = form.new_version;
         this.editform.upg_path = form.update_url;
         if (form.boardUpdate) {
@@ -153,9 +174,10 @@
           config_temp += OVER_72h_WARN;
         }
         config_temp += '.';
-        console.log(config_temp)
         this.editform.config = config_temp;
-        console.log(this.editform.config)
+        this.editform.update_url = 'http://175.178.33.163:8080/healthInfos/download?name=' + this.filename
+        this.editform.new_version =
+          console.log(this.editform)
         editDeviceConfig(this.editform).then(response => {
             if (response.status == 200) {
               this.$notify({
