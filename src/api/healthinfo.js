@@ -9,13 +9,23 @@ export function fetchHealthInfoList(queryList) {
     method: 'get',
     params: {
       owner: queryList.owner,
+      sn: queryList.sn || undefined,
+      code_color: queryList.code_color || undefined,
+      type: queryList.type || undefined,
       page: queryList.page - 1,
       size: queryList.size,
-      sort: queryList.sort
+      sortType: queryList.sortType || undefined,
+      sortFields: queryList.sortFields || undefined
     }
   })
 }
 
+export function fetchHealthInfobyUuid(uuid) {
+  return request({
+    url: '/healthInfos/' + uuid,
+    method: 'get'
+  })
+}
 
 
 export function createNewHealthInfo(list) {

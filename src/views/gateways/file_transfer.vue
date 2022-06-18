@@ -1,7 +1,8 @@
 <template>
   <div>
-    <el-upload ref="upload" :limit="1" :before-upload="beforeUpload" :auto-upload="false" :headers="headers"
-      :on-success="handleSuccess" :on-error="handleError" :action="'http://localhost:8080/healthInfos/upload'">
+    <el-upload ref="upload" :limit="1" :headers="headers" :before-upload="beforeUpload" :auto-upload="false"
+      :on-success="handleSuccess" :on-error="handleError" :action="'http://175.178.33.163:8080/healthInfos/upload'">
+      <!-- :on-success="handleSuccess" :on-error="handleError" :action="'http://192.168.1.83:8080/healthInfos/upload'"> -->
       <div><i class="el-icon-upload" /> 添加文件</div>
       <div slot="tip" class="el-upload__tip">可上传任意格式文件，且不超过1000M</div>
     </el-upload>
@@ -10,12 +11,17 @@
 </template>
 
 <script>
+  import {
+    getToken
+  } from '@/utils/auth'
   export default {
     name: 'upload',
     data() {
       return {
         loading: false,
-
+        headers: {
+          'Authorization': getToken()
+        },
         filename: ''
       }
     },

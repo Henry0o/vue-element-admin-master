@@ -11,17 +11,17 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input ref="username" v-model="loginForm.username" placeholder="Username" name="username" type="text"
+        <el-input ref="username" v-model="loginForm.username" placeholder="请输入账户邮箱" name="username" type="text"
           tabindex="1" autocomplete="on" />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+      <el-tooltip v-model="capsTooltip" content="大写锁定已打开" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
           <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
-            placeholder="Password" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
+            placeholder="请输入密码" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
             @blur="capsTooltip = false" @keyup.enter.native="handleLogin" />
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
@@ -34,38 +34,38 @@
       <el-link type="success" style="width:100%;margin-bottom:30px;" @click="onRegister">如果未拥有账号，请点击注册</el-link>
       <!-- <div class="app-container"> -->
       <div>
-        <el-dialog title="注册" :visible.sync="dialogFormVisible" style="width:50%;margin-left:25%">
+        <el-dialog title="注册" :visible.sync="dialogFormVisible" style="width:50%;margin-left:25%;">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
             <el-form-item prop="name">
               <span class="svg-container">
                 <svg-icon icon-class="user" />
               </span>
-              <el-input ref v-model="ruleForm.name" placeholder="用户名称" type="text" />
+              <el-input ref v-model="ruleForm.name" placeholder="用户名称" type="text" class="register_input" />
             </el-form-item>
             <el-form-item prop="mobile_phone">
               <span class="svg-container">
                 <i class="el-icon-phone" />
               </span>
-              <el-input ref v-model="ruleForm.mobile_phone" placeholder="手机号码" type="text" />
+              <el-input ref v-model="ruleForm.mobile_phone" placeholder="手机号码" type="text" class="register_input" />
             </el-form-item>
 
             <el-form-item prop="email">
               <span class="svg-container">
                 <svg-icon icon-class="email" />
               </span>
-              <el-input ref v-model="ruleForm.email" placeholder="邮箱" type="text" />
+              <el-input ref v-model="ruleForm.email" placeholder="邮箱" type="text" class="register_input" />
             </el-form-item>
             <el-form-item prop="password">
               <span class="svg-container">
                 <svg-icon icon-class="password" />
               </span>
-              <el-input ref v-model="ruleForm.password" placeholder="密码" type="text" />
+              <el-input ref v-model="ruleForm.password" placeholder="密码" type="password" class="register_input" />
             </el-form-item>
             <el-form-item prop="checkpass">
               <span class="svg-container">
                 <svg-icon icon-class="password" />
               </span>
-              <el-input ref v-model="ruleForm.checkpass" placeholder="确认密码" type="text" />
+              <el-input ref v-model="ruleForm.checkpass" placeholder="确认密码" type="password" class="register_input" />
             </el-form-item>
             <span style="width:50%;">
               <el-button type="success" style="margin-left:28%;margin-right:10%;" @click="handleRegister">注册</el-button>
@@ -140,7 +140,7 @@
       };
       const validateUsername = (rule, value, callback) => {
         if (!validUsername(value)) {
-          callback(new Error('请输入正确的用户名'))
+          callback(new Error('请输入正确的邮箱账号'))
         } else {
           callback()
         }
@@ -480,6 +480,14 @@
       .thirdparty-button {
         display: none;
       }
+    }
+
+    ::v-deep .register_input .el-input__inner {
+      width: 100%;
+      background-color: #e8e8e8;
+      // text-align: center;
+      border-color: #c0c4cc;
+      color: #000
     }
   }
 

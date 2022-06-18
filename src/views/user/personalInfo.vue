@@ -20,7 +20,7 @@
       </el-form-item> -->
       <el-form-item label="手机号码" prop="mobile_phone">
         <el-input placeholder="请输入手机号" v-model="form.mobile_phone" class="input-with-select">
-          <el-select v-model="form.nationcode" slot="prepend" class="filter-item" placeholder="Please select"
+          <el-select v-model="form.nationcode" slot="prepend" class="filter-item" placeholder="号码归属地"
             style="width:110px;text-align:center;">
             <el-option v-for="nationcode in nationsOptions" :key="nationcode.key" :label="nationcode.display_name"
               :value="nationcode.key" />

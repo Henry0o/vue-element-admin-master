@@ -9,6 +9,7 @@
       </el-form-item>
       <el-form-item label="更新包路径">
         <el-input v-model="form.update_url"></el-input>
+        <div>PS:name后面加对应上传的文件名即可,浏览器访问即可下载,设备下载时可能需要用GET方法下载,上传文件名不可以带中文</div>
       </el-form-item>
       <el-form-item label="广播配置设置">
         <el-switch v-model="form.boardConfig"></el-switch>

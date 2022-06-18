@@ -2,14 +2,31 @@
   <div class="app-container">
     <!-- 查询模块 -->
     <div class="filter-container">
-      <el-input v-model="listQuery.owner" placeholder="输入查询的账户" style="width:300px;" class="filter-item"
+      <el-input v-model="listQuery.owner" clearable placeholder="请输入查询的账户邮箱" style="width:200px;" class="filter-item"
         @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.sn" clearable placeholder="请输入要查询的设备序列号" style="width:200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.code_color" clearable placeholder="请输入查询的健康码状态" style="width:200px;"
+        class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.type" clearable placeholder="请输入查询的二维码类型" style="width:200px;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
+
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search"
         @click="handleFilter">
         查询
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
-        @click="handleCreate">新增</el-button>
+      <el-select v-model="listQuery.sortFields" placeholder="请选择排序关键字" class="filter-item" style="margin-left: 10px;">
+        <el-option v-for="item in options_sortFields" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-select v-model="listQuery.sortType" placeholder="请选择排序方式" class="filter-item">
+        <el-option v-for="item in options_sortType" :key="item.value" :label="item.label" :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search"
+        @click="handleFilter">
+        排序
+      </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh"
         @click="refreshList">
         刷新</el-button>
@@ -18,9 +35,9 @@
     <!-- 列表模块 -->
     <div>
       <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width:100%;">
-        <el-table-column label="账号" prop="owner" align="center">
+        <el-table-column label="设备注册地址" prop="address" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.owner }}</span>
+            <span>{{ row.address }}</span>
           </template>
         </el-table-column>
         <el-table-column label="版本" prop="version" width align="center">
@@ -59,14 +76,17 @@
             <el-button type="primary" size @click="handleDetials(row)">
               详情
             </el-button>
-            <el-button type="danger" size @click="handleDelete(row)">
-              删除
-            </el-button>
+
+            <el-popconfirm icon="el-icon-info" iconColor="red" v-model="popconfirm_visible" title="删除后不可恢复,确定删除吗？"
+              @onConfirm="handleDelete(row)" style="margin-left: 10px;">
+              <el-button type="danger" size slot="reference">
+                删除
+              </el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
     </div>
-
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size"
       @pagination="getList" />
 
@@ -126,7 +146,8 @@
           <el-input v-model="temp.code_color" />
         </el-form-item>
         <el-form-item label="抓拍照片" prop="photo">
-          <el-button v-show="showimg_button_visible" type="primary" @click="showPhoto(temp.photo)">显示</el-button>
+          <el-button v-show="showimg_button_visible" type="primary" @click="showPhoto(temp.photo)">显示
+          </el-button>
           <el-button v-show="!showimg_button_visible" type="info" plain disabled>未上传</el-button>
         </el-form-item>
         <el-form-item label="图片抓拍时间" prop="photo_time">
@@ -159,30 +180,37 @@
           <el-input v-model="temp.qr_create" />
         </el-form-item>
         <el-form-item label="行程信息" prop="trip">
-          <el-input v-model="temp.trip" />
+          <!-- <el-input v-model="temp.trip" type="textarea" :rows="2" /> -->
+          <div>{{temp.trip}}</div>
         </el-form-item>
         <el-form-item label="二维码内容" prop="qr_content">
-          <el-input v-model="temp.qr_content" type="textarea" :rows="2" />
+          <!-- <el-input v-model="temp.qr_content" type="textarea" :rows="2" /> -->
+          <div>{{temp.qr_content}}</div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogDetailsVisible = false">
           关闭
         </el-button>
-        <el-button type="success" @click="HandleEditHealthInfo">修改</el-button>
+        <!-- <el-button type="success" @click="HandleEditHealthInfo">修改</el-button> -->
       </div>
     </el-dialog>
-    <el-dialog title="图片" :visible.sync="showImage">
-      <img :src="'data:image/jpg;base64,'+photoBase64" width="100%" alt="图片未上传" />
+    <el-dialog id="photo-dialog" :visible.sync="showImage">
+      <!-- <tr>
+        <el-button @click="rotate('left')" style="position: relative">左旋</el-button>
+        <el-button @click="rotate('right')">右旋</el-button>
+      </tr> -->
+      <el-image style="width: 100%; height: auto" :src="photoBase64" :preview-src-list="photoBase64List">
+      </el-image>
     </el-dialog>
   </div>
 </template>
-
 <script>
   import Pagination from '@/components/Pagination'
 
   import {
     fetchHealthInfoList,
+    fetchHealthInfobyUuid,
     createNewHealthInfo,
     deleteHealthInfo,
     editHealthInfo
@@ -195,12 +223,33 @@
 
     data() {
       return {
+        popconfirm_visible: false,
         showimg_button_visible: false,
         showImage: false,
         photoBase64: '',
+        photoBase64List: [],
         list: null,
         total: 0,
         listLoading: true,
+        options_sortFields: [{
+          value: 'sn',
+          label: '设备序列号'
+        }, {
+          value: 'code_color',
+          label: '健康码状态'
+        }, {
+          value: 'type',
+          label: '二维码类型'
+        }],
+        options_sortType: [{
+            value: 'DESC',
+            label: '降序'
+          },
+          {
+            value: 'ASC',
+            label: '升序'
+          }
+        ],
         EditRules: {
           code_color: [{
             required: true,
@@ -233,9 +282,13 @@
         },
         listQuery: {
           owner: '',
+          sn: '',
+          code_color: '',
+          type: '',
           page: 1,
           size: 20,
-          sort: ''
+          sortType: '',
+          sortFields: ''
         },
 
         temp: {
@@ -258,7 +311,8 @@
           qr_show: '',
           qr_create: '',
           trip: '',
-          qr_content: ''
+          qr_content: '',
+          address: ''
         },
         createList: {
           sn: '',
@@ -321,14 +375,26 @@
         this.dialogCreateVisible = true
       },
       handleDetials(row) {
-        this.temp = Object.assign({}, row)
-        this.dialogDetailsVisible = true
-        console.log(this.temp.photo)
-        if (this.temp.photo.length > 0) {
-          this.showimg_button_visible = true
-        } else {
-          this.showimg_button_visible = false
-        }
+        console.log(row)
+        fetchHealthInfobyUuid(row.uuid).then(response => {
+          this.temp = Object.assign({}, response.data)
+          console.log(this.temp)
+          if (this.temp.qr_show.length === 6) {
+            let qrShowTimeRotate = this.temp.qr_show;
+            let hour = qrShowTimeRotate.substring(0, 2);
+            let min = qrShowTimeRotate.substring(2, 4);
+            let sec = qrShowTimeRotate.substring(4, 6);
+            qrShowTimeRotate = hour + ':' + min + ':' + sec;
+            this.temp.qr_show = qrShowTimeRotate;
+          }
+        }).then(() => {
+          if (this.temp.photo.length > 0) {
+            this.showimg_button_visible = true
+          } else {
+            this.showimg_button_visible = false
+          }
+          this.dialogDetailsVisible = true
+        })
       },
       HandleEditHealthInfo() {
         editHealthInfo(this.temp).then(() => {
@@ -365,16 +431,107 @@
         })
       },
       showPhoto(photo) {
-        this.photoBase64 = photo;
+        this.photoBase64 = 'data:image/jpg;base64,' + photo;
+        // var tempList = [this.photoBase64]
+        this.photoBase64List = [this.photoBase64]
         this.showImage = true;
+      },
+      rotate(direction) {
+        const img = document.getElementById("photo-health")
+        console.log(img.className)
+        if (direction === 'right') {
+          if (img.className === 'style1') {
+            img.setAttribute("class", "style2")
+          } else if (img.className === 'style2') {
+            img.setAttribute("class", "style3")
+          } else if (img.className === 'style3') {
+            img.setAttribute("class", "style4")
+          } else {
+            img.setAttribute("class", "style1")
+          }
+        } else {
+          if (img.className === 'style1') {
+            img.setAttribute("class", "style4")
+          } else if (img.className === 'style2') {
+            img.setAttribute("class", "style1")
+          } else if (img.className === 'style3') {
+            img.setAttribute("class", "style2")
+          } else {
+            img.setAttribute("class", "style3")
+          }
+        }
+        // 这里的思维就是，把图片映射到一个画板上，然后对图片进行重新绘制，所以这里要建一个canvas对象来充当我们的画板
+        // const canvas = document.createElement('canvas')
+        // // base64转换image对象
+        // img.src = this.photoBase64
+        // console.log(img.src)
+        // // 这里记得一定要在base64转换成图片对象后再进行其它操作，笔者在这里踩了个坑，onload方法就是图片加载再进行其它操作，如果图片是文件路径方式跨域调用效果更加明显
+        // img.onload = () => {
+        // // img的高度和宽度不能在img元素隐藏后获取，否则会出错
+        // const height = img.height
+        // const width = img.width
+        // console.log(height)
+        // // 旋转角度以弧度值为参数
+        // const ctx = canvas.getContext('2d')
+        // if (direction === 'right') {
+        // canvas.width = height
+        // canvas.height = width
+        // ctx.rotate(90 * Math.PI / 180)
+        // ctx.drawImage(img, 0, 0, width, -height)
+        // } else {
+        // canvas.width = height
+        // canvas.height = width
+        // ctx.rotate(-90 * Math.PI / 180)
+        // ctx.drawImage(img, 0, 0, -width, height)
+        // }
+        // // 旋转后的图片重新转为base64
+        // }
       }
-
 
     }
   }
 
 </script>
+<style scoped>
+  #photo_rotate {
+    transform: rotate(270deg);
+    transition: all 1ms;
+  }
 
-<style>
+
+  #photo-dialog {
+    background: rgba(185, 92, 92, 0);
+
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0);
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0);
+  }
+
+  .style1 {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .style2 {
+    display: block;
+    transform: rotate(90deg);
+    height: auto;
+    max-width: 50%;
+  }
+
+  .style3 {
+    display: block;
+    transform: rotate(180deg);
+    max-width: 100%;
+    height: auto;
+  }
+
+  .style4 {
+    display: block;
+    transform: rotate(270deg);
+    max-width: 50%;
+    height: auto;
+  }
 
 </style>

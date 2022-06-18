@@ -16,12 +16,12 @@
       </div>
       <el-form :model="QRForm" ref="QRForm" :rules="QRCreaterules" label-width="100px"
         style="width:50%;margin-left:25%;margin-top:3%">
-        <el-form-item prop=" address" label="地址">
+        <el-form-item prop=" address" label="设备安装地址">
           <el-input v-model="QRForm.address"></el-input>
         </el-form-item>
-        <el-form-item prop="owner" label="账号">
+        <!-- <el-form-item prop="owner" label="账号">
           <el-input v-model="QRForm.owner"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item prop="contact" label="联系人">
           <el-input v-model="QRForm.contact"></el-input>
         </el-form-item>
@@ -83,20 +83,28 @@
           owner: '',
           contact: '',
           phone: '',
-          RegisterServerAdd: 'http://192.168.1.83:8080/gateways/addHealthCode',
-          DataServerAdd: 'http://192.168.1.83:8080/healthInfos',
+          // RegisterServerAdd: 'http://192.168.1.83:8080/gateways/addHealthCode',
+          RegisterServerAdd: 'http://175.178.33.163:8080/gateways/addHealthCode',
+          // DataServerAdd: 'http://192.168.1.83:8080/healthInfos',
+          DataServerAdd: 'http://175.178.33.163:8080/healthInfos',
         },
         QRCreaterules: {
-          owner: [{
-              required: true,
-              message: '请输入账号',
-              trigger: 'blur'
-            },
-            {
-              trigger: 'blur',
-              validator: RegTest
-            }
-          ]
+          // owner: [{
+          //     required: true,
+          //     message: '请输入账号',
+          //     trigger: 'blur'
+          //   },
+          //   {
+          //     trigger: 'blur',
+          //     validator: RegTest
+          //   }
+          // ]
+          phone: [{
+            min: 11,
+            max: 11,
+            message: '请输入11位手机号',
+            trigger: 'blur'
+          }]
         },
         // config: {
         //   value: '', //显示的值、跳转的地址
@@ -112,6 +120,8 @@
         this.$refs[QRForm].validate((valid) => {
           if (valid) {
             // this.config.value = 'www.baidu.com';
+            this.QRForm.owner = this.$store.getters.email;
+            // console.log(this.QRForm)
             let context = '~' + JSON.stringify(this.QRForm) + '.';
             // this.config.value = '~' + '{"address":"' + this.QRForm.address + '","owner":"' + this.QRForm.owner +
             //   '","contact":"' + this.QRForm.contact + '","phone":"' + this.QRForm.phone +

@@ -112,7 +112,7 @@
         <el-form-item label="公司" prop="corp">
           <el-input v-model="temp.corp" />
         </el-form-item>
-        <el-form-item label="地址" prop="address">
+        <el-form-item label="设备安装地址" prop="address">
           <el-input v-model="temp.address" />
         </el-form-item>
         <el-form-item label="管理员" prop="admin_name">
