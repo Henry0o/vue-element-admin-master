@@ -195,7 +195,7 @@ export const asyncRoutes = [{
       //   }
       // },
 
-      //设备远程连接，通过MQTT
+      //设备远程连接， 通过MQTT
       // {
       //   path: 'mqtt_operation',
       //   component: () => import('@/views/gateways/mqtt_operation'),
@@ -228,8 +228,8 @@ export const asyncRoutes = [{
         component: () => import('@/views/gateways/device_config'),
         name: 'device_config',
         meta: {
-          title: '设备配置',
-          roles: ['ADMIN']
+          title: '设备配置'
+          // roles: ['ADMIN']
         }
       }
       // {

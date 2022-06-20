@@ -1,37 +1,39 @@
 <template>
   <div class="app-container">
     <!-- 查询模块 -->
-    <div class="filter-container">
-      <el-input v-model="listQuery.owner" clearable placeholder="请输入查询的账户邮箱" style="width:200px;" class="filter-item"
+    <div class="filter-container" style="width:100%;display: inline-block">
+      <el-input v-model="listQuery.owner" clearable placeholder="账户邮箱" style="width:11%;" class="filter-item"
         @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.sn" clearable placeholder="请输入要查询的设备序列号" style="width:200px;" class="filter-item"
+      <el-input v-model="listQuery.sn" clearable placeholder="设备序列号" style="width:11%;" class="filter-item"
         @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.code_color" clearable placeholder="请输入查询的健康码状态" style="width:200px;"
-        class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.type" clearable placeholder="请输入查询的二维码类型" style="width:200px;" class="filter-item"
+      <el-input v-model="listQuery.code_color" clearable placeholder="健康码状态" style="width:11%;" class="filter-item"
+        @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.type" clearable placeholder="二维码类型" style="width:11%;" class="filter-item"
         @keyup.enter.native="handleFilter" />
 
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search"
+      <el-button class="filter-item" style="margin-left: 10px;width:;" type="primary" icon="el-icon-search"
         @click="handleFilter">
         查询
       </el-button>
-      <el-select v-model="listQuery.sortFields" placeholder="请选择排序关键字" class="filter-item" style="margin-left: 10px;">
+      <el-select v-model="listQuery.sortFields" placeholder="请选择排序关键字" class="filter-item"
+        style="margin-left: 10px;width:11%;">
         <el-option v-for="item in options_sortFields" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-select v-model="listQuery.sortType" placeholder="请选择排序方式" class="filter-item">
+      <el-select v-model="listQuery.sortType" placeholder="请选择排序方式" class="filter-item" style="width:11%;">
         <el-option v-for="item in options_sortType" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search"
+      <el-button class="filter-item" style="margin-left: 10px;width:;" type="primary" icon="el-icon-search"
         @click="handleFilter">
         排序
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh"
+      <el-button class="filter-item" style="margin-left: 10px;width:;" type="primary" icon="el-icon-refresh"
         @click="refreshList">
         刷新</el-button>
 
     </div>
+
     <!-- 列表模块 -->
     <div>
       <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width:100%;">

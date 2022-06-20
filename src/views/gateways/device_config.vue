@@ -5,16 +5,16 @@
         <el-switch v-model="form.boardUpdate"></el-switch>
       </el-form-item>
       <el-form-item label="选择更新包">
-        <el-select v-model="filename" placeholder="请选择更新包">
-          <el-option v-for="item in files" :key="item.version" :label="item.version" :value="item.fileName">
+        <el-select v-model="filename_temp" @change="selectGet" placeholder="请选择更新包">
+          <el-option v-for="item in files" :key="item.id" :label="item.version" :value="item.fileName">
             <span style="float: left">{{ item.version }}</span>
             <span style="float: right; color: #8492a6; font-size: 13px">{{ item.aliasName }}</span>
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="最新版本">
+      <!-- <el-form-item label="最新版本">
         <el-input v-model="form.new_version"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="更新包路径">
         <el-input v-model="form.update_url"></el-input>
         <div>PS:name后面加对应上传的文件名即可,浏览器访问即可下载,设备下载时可能需要用GET方法下载,上传文件名不可以带中文</div>
@@ -70,7 +70,9 @@
     data() {
 
       return {
-        filename: '',
+        model_file: '',
+        filename_temp: '',
+        version_temp: '',
         files: null,
         form: {
           boardUpdate: false,
@@ -98,19 +100,31 @@
     created() {
       this.getList();
       this.getFiles();
+
     },
     watch() {
+
+    },
+    mounted: {
 
     },
     methods: {
       getFiles() {
         fetchAllFileNameList().then(response => {
           this.files = response.data
+          let obj = this.files.find(item => item.version === this.editform.version)
+          this.filename_temp = obj.fileName;
         })
       },
       getList() {
         getDeviceConfig().then(response => {
           this.editform = response.data;
+          console.log(this.editform);
+          console.log(this.editform.version);
+          // console.log(this.files)
+
+
+
           if (this.editform.boardUpdate === 1) {
             this.form.boardUpdate = true;
           } else {
@@ -175,9 +189,11 @@
         }
         config_temp += '.';
         this.editform.config = config_temp;
-        this.editform.update_url = 'http://175.178.33.163:8080/healthInfos/download?name=' + this.filename
-        this.editform.new_version =
-          console.log(this.editform)
+        this.editform.update_url = 'http://175.178.33.163:8080/healthInfos/download?name=' + this.filename_temp;
+        // this.editform.new_version = this.$refs.operateName.selectedLabel;
+        let tem = this.files.find(item => item.fileName === this.filename_temp);
+        this.editform.version = tem.version;
+        console.log(this.editform)
         editDeviceConfig(this.editform).then(response => {
             if (response.status == 200) {
               this.$notify({
@@ -195,7 +211,19 @@
 
         )
 
+      },
+      selectGet(fileName) { // 这个vId也就是value值
+
+        let obj = {};
+        obj = this.files.find((item) => { // 这里的userList就是上面遍历的数据源
+          return item.fileName === fileName; // 筛选出匹配数据
+        });
+        this.filename_temp = obj.fileName;
+        this.version_temp = obj.version;
+        // console.log(obj.id);
+        // console.log(obj.name); // 这边的name就是对应label
       }
+
     }
   }
 
