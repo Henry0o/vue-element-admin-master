@@ -42,6 +42,8 @@
         </el-table-column>
       </el-table>
     </div>
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size"
+      @pagination="getList" />
     <el-dialog title="上传文件" :visible.sync="upLoadVisible">
       <div>
         <el-form :model="fileInfo" label-position="left" label-width="120px" style="width: 72%; margin-left:10%;">

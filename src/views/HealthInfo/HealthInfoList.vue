@@ -362,16 +362,9 @@
 
       },
       handleFilter(row) {
-        if (this.$store.getters.roles[0] === 'USER' && this.listQuery.owner !== this.$store.getters.email) {
-          this.$notify({
-            title: '权限不足',
-            message: '对不起，您无权查看其他用户信息',
-            type: 'error',
-            duration: 2000
-          })
-        } else {
-          this.getList()
-        }
+
+        this.getList()
+
       },
       handleCreate() {
         this.dialogCreateVisible = true

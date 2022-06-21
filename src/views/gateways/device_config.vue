@@ -105,14 +105,14 @@
     watch() {
 
     },
-    mounted: {
 
-    },
     methods: {
       getFiles() {
         fetchAllFileNameList().then(response => {
           this.files = response.data
+          console.log(this.files);
           let obj = this.files.find(item => item.version === this.editform.version)
+          console.log(obj);
           this.filename_temp = obj.fileName;
         })
       },
@@ -159,7 +159,7 @@
       },
       EditList(form) {
         this.editform.version = form.new_version;
-        this.editform.upg_path = form.update_url;
+        // this.editform.upg_path = form.update_url;
         if (form.boardUpdate) {
           this.editform.boardUpdate = 1;
         } else {
@@ -189,7 +189,7 @@
         }
         config_temp += '.';
         this.editform.config = config_temp;
-        this.editform.update_url = 'http://175.178.33.163:8080/healthInfos/download?name=' + this.filename_temp;
+        this.editform.upg_path = 'http://175.178.33.163:8080/healthInfos/download?name=' + this.filename_temp;
         // this.editform.new_version = this.$refs.operateName.selectedLabel;
         let tem = this.files.find(item => item.fileName === this.filename_temp);
         this.editform.version = tem.version;

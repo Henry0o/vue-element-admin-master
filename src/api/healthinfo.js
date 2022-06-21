@@ -8,7 +8,7 @@ export function fetchHealthInfoList(queryList) {
     url: '/healthInfos',
     method: 'get',
     params: {
-      owner: queryList.owner,
+      owner: queryList.owner || undefined,
       sn: queryList.sn || undefined,
       code_color: queryList.code_color || undefined,
       type: queryList.type || undefined,
