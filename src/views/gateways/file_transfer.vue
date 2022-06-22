@@ -7,9 +7,9 @@
     <!-- 列表模块 -->
     <div>
       <el-table v-loading="listLoading" :data="list" stripe border highlight-current-row style="width:100%;">
-        <el-table-column fixed label="序号" prop="id" sortable width="150px" align="center">
+        <el-table-column fixed label="更新时间" prop="updatedAt" sortable width="150px" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
+            <span>{{ row.updatedAt }}</span>
           </template>
         </el-table-column>
         <el-table-column label="版本号" prop="version" sortable width="150" align="center">
@@ -111,6 +111,7 @@
     deleteFileName,
     deleteFile
   } from '@/api/fileNameList'
+
   export default {
     name: 'upload',
     components: {
@@ -154,11 +155,26 @@
     },
     methods: {
       // 上传文件
+      formatDate(now) {
+        var year = now.getFullYear(); //取得4位数的年份
+        var month = now.getMonth() + 1; //取得日期中的月份，其中0表示1月，11表示12月
+        var date = now.getDate(); //返回日期月份中的天数（1到31）
+        var hour = now.getHours(); //返回日期中的小时数（0到23）
+        var minute = now.getMinutes(); //返回日期中的分钟数（0到59）
+        var second = now.getSeconds(); //返回日期中的秒数（0到59）
+        return year + "-" + month + "-" + date + " " + hour + ":" + minute + ":" + second;
+      },
+
       getList() {
         this.listLoading = true;
         fetchFileNameList(this.listQuery).then(response => {
           this.list = response.data
           this.total = response.totalItems
+          for (var i = 0; i < this.list.length; i++) {
+            console.log(this.list[i].updatedAt)
+            var d = new Date(this.list[i].updatedAt);
+            this.list[i].updatedAt = this.formatDate(d)
+          }
           this.listLoading = false;
         })
       },
@@ -211,6 +227,7 @@
       },
       handleEdit(row) {
         this.temp = Object.assign({}, row);
+        this.temp.updatedAt = 0;
         this.dialogEditVisible = true
       },
       EditFileInfo() {
