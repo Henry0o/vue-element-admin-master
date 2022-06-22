@@ -37,7 +37,7 @@
     <!-- 列表模块 -->
     <div>
       <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width:100%;">
-        <el-table-column label="设备注册地址" prop="address" align="center">
+        <el-table-column label="设备安装地址" prop="address" align="center">
           <template slot-scope="{row}">
             <span>{{ row.address }}</span>
           </template>

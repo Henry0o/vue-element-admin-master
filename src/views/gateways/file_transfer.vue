@@ -100,6 +100,7 @@
 </template>
 
 <script>
+  import Pagination from '@/components/Pagination'
   import {
     getToken
   } from '@/utils/auth'
@@ -112,6 +113,9 @@
   } from '@/api/fileNameList'
   export default {
     name: 'upload',
+    components: {
+      Pagination
+    },
     data() {
       return {
         dialogEditVisible: false,
